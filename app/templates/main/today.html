@@ -18,7 +18,7 @@
             <span class="badge badge-{{ visit.status }}">{{ visit.status|capitalize }}</span>
         </div>
         {% if visit.scheduled_time %}
-        <p class="text-sm text-gray-600 mt-1">🕐 {{ visit.scheduled_time[:5] }}</p>
+        <p class="text-sm text-gray-600 mt-1">🕐 {{ visit.scheduled_time|time12 }}</p>
         {% endif %}
         <p class="text-sm text-gray-600 mt-1">📍 {{ visit.clients.address|truncate(40) }}</p>
     </a>
