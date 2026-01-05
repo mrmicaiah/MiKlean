@@ -9,6 +9,30 @@ from ..supabase_client import get_supabase
 bp = Blueprint('visits', __name__)
 
 
+@bp.route('/schedule')
+@login_required
+def pick_client_for_schedule():
+    """Pick a client to schedule a visit for."""
+    user_id = get_current_user_id()
+    supabase = get_supabase()
+    
+    search = request.args.get('search', '').strip()
+    
+    # Get all clients (both prospects and clients can be scheduled)
+    query = supabase.table('clients')\
+        .select('id, name, phone, address, type')\
+        .eq('user_id', user_id)\
+        .order('name')
+    
+    if search:
+        query = query.ilike('name', f'%{search}%')
+    
+    response = query.execute()
+    clients = response.data if response.data else []
+    
+    return render_template('visits/pick_client.html', clients=clients, search=search)
+
+
 @bp.route('/clients/<client_id>/schedule', methods=['GET', 'POST'])
 @login_required
 def schedule_visits(client_id):
@@ -110,7 +134,7 @@ def schedule_visits(client_id):
                 flash(f'Visit scheduled for {client["name"]} on {start_date.strftime("%b %d")}.', 'success')
             else:
                 flash(f'{len(visits_to_create)} visits scheduled for {client["name"]}.', 'success')
-            return redirect(url_for('clients.view_client', client_id=client_id))
+            return redirect(url_for('main.calendar', date_str=start_date.isoformat()))
             
         except Exception as e:
             flash('Failed to schedule visits.', 'error')
