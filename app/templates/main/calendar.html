@@ -46,7 +46,6 @@
             {% set current_date = first_of_month.replace(day=day) %}
             {% set date_str = current_date.strftime('%Y-%m-%d') %}
             {% set has_visits = date_str in visits_by_date %}
-            {% set visit_count = visits_by_date[date_str]|length if has_visits else 0 %}
             {% set is_selected = current_date == selected_date %}
             {% set is_today = current_date == today %}
             
@@ -55,11 +54,7 @@
                       {% if is_selected %}bg-ink text-white{% elif is_today %}bg-brand/20{% else %}hover:bg-neutral-100{% endif %}">
                 <span class="text-sm font-medium {% if is_selected %}font-bold{% endif %}">{{ day }}</span>
                 {% if has_visits %}
-                <div class="flex gap-0.5 mt-0.5">
-                    {% for i in range([visit_count, 3]|min) %}
-                    <span class="w-1.5 h-1.5 rounded-full {% if is_selected %}bg-brand{% else %}bg-ink{% endif %}"></span>
-                    {% endfor %}
-                </div>
+                <span class="w-1.5 h-1.5 rounded-full mt-0.5 {% if is_selected %}bg-brand{% else %}bg-ink{% endif %}"></span>
                 {% endif %}
             </a>
         {% endfor %}
