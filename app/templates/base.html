@@ -55,28 +55,23 @@
             min-height: 100vh;
         }
         
-        /* Header with diagonal stripes accent */
-        .header-pattern {
-            background-color: #FFC107;
+        /* Header with swoosh gradient */
+        .header-swoosh {
+            background: #FFC107;
             position: relative;
             overflow: hidden;
         }
         
-        .header-pattern::before {
+        .header-swoosh::before {
             content: '';
             position: absolute;
-            top: 0;
-            right: -20px;
-            width: 100px;
-            height: 100%;
-            background: repeating-linear-gradient(
-                -55deg,
-                transparent,
-                transparent 8px,
-                #0A0A0A 8px,
-                #0A0A0A 16px
-            );
-            opacity: 0.15;
+            top: -50%;
+            right: -20%;
+            width: 70%;
+            height: 200%;
+            background: radial-gradient(ellipse at center, #0A0A0A 0%, #0A0A0A 40%, transparent 70%);
+            transform: rotate(-20deg);
+            opacity: 0.95;
         }
         
         /* Cards with left accent border */
@@ -223,12 +218,12 @@
         .fab {
             width: 52px;
             height: 52px;
-            background: #0A0A0A;
+            background: #FFC107;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
             transition: all 0.15s ease;
         }
         
@@ -241,8 +236,8 @@
 </head>
 <body class="bg-[#F5F5F5] min-h-screen {% block body_class %}{% endblock %}">
     {% block body %}
-    <!-- Header - Yellow with pattern and black bottom border -->
-    <header class="header-pattern border-b-4 border-ink safe-top">
+    <!-- Header - Yellow with black swoosh -->
+    <header class="header-swoosh safe-top">
         <div class="px-5 py-5 relative z-10">
             {% block header %}
             <div class="flex items-center justify-between">
