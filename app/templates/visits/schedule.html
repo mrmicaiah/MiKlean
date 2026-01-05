@@ -68,36 +68,63 @@
     
     <!-- Recurring Options (hidden by default) -->
     <div id="recurring_options" class="card hidden">
-        <p class="text-sm font-semibold text-ink mb-3">Recurring Options</p>
+        <p class="text-sm font-semibold text-ink mb-3">How Often?</p>
         
         <div class="space-y-4">
-            <div>
-                <label for="recurring_frequency" class="block text-sm font-medium text-neutral-600 mb-1.5">How often?</label>
-                <select id="recurring_frequency" name="recurring_frequency" class="input">
-                    <option value="weekly" {% if estimate and estimate.frequency == 'weekly' %}selected{% endif %}>Every week</option>
-                    <option value="biweekly" {% if estimate and estimate.frequency == 'biweekly' %}selected{% endif %}>Every 2 weeks</option>
-                    <option value="monthly" {% if estimate and estimate.frequency == 'monthly' %}selected{% endif %}>Monthly</option>
-                </select>
+            <!-- Quick Options -->
+            <div class="grid grid-cols-2 gap-2">
+                <label class="relative">
+                    <input type="radio" name="recurring_frequency" value="weekly" class="peer sr-only" checked>
+                    <div class="p-3 text-center rounded-lg cursor-pointer border-b-3 border-neutral-200 bg-neutral-50 text-neutral-600 peer-checked:border-brand peer-checked:bg-brand/10 peer-checked:text-ink font-semibold text-sm transition-all">
+                        Weekly
+                    </div>
+                </label>
+                <label class="relative">
+                    <input type="radio" name="recurring_frequency" value="biweekly" class="peer sr-only">
+                    <div class="p-3 text-center rounded-lg cursor-pointer border-b-3 border-neutral-200 bg-neutral-50 text-neutral-600 peer-checked:border-brand peer-checked:bg-brand/10 peer-checked:text-ink font-semibold text-sm transition-all">
+                        Every 2 Weeks
+                    </div>
+                </label>
+                <label class="relative">
+                    <input type="radio" name="recurring_frequency" value="monthly" class="peer sr-only">
+                    <div class="p-3 text-center rounded-lg cursor-pointer border-b-3 border-neutral-200 bg-neutral-50 text-neutral-600 peer-checked:border-brand peer-checked:bg-brand/10 peer-checked:text-ink font-semibold text-sm transition-all">
+                        Monthly
+                    </div>
+                </label>
+                <label class="relative">
+                    <input type="radio" name="recurring_frequency" value="custom" class="peer sr-only">
+                    <div class="p-3 text-center rounded-lg cursor-pointer border-b-3 border-neutral-200 bg-neutral-50 text-neutral-600 peer-checked:border-brand peer-checked:bg-brand/10 peer-checked:text-ink font-semibold text-sm transition-all">
+                        Custom...
+                    </div>
+                </label>
+            </div>
+            
+            <!-- Custom Interval (hidden by default) -->
+            <div id="custom_interval" class="hidden p-4 bg-neutral-50 rounded-lg">
+                <label class="block text-sm font-medium text-neutral-600 mb-2">Every how many months?</label>
+                <div class="flex items-center gap-3">
+                    <span class="text-neutral-500">Every</span>
+                    <input type="number" id="custom_months" name="custom_months" min="1" max="12" value="3" 
+                        class="input w-20 text-center font-bold">
+                    <span class="text-neutral-500">month(s)</span>
+                </div>
+                <p class="text-xs text-neutral-400 mt-2">Great for deep cleans, seasonal visits, etc.</p>
             </div>
             
             <div>
-                <label for="preferred_day" class="block text-sm font-medium text-neutral-600 mb-1.5">Preferred Day</label>
-                <select id="preferred_day" name="preferred_day" class="input">
-                    <option value="">Based on start date</option>
-                    <option value="monday">Monday</option>
-                    <option value="tuesday">Tuesday</option>
-                    <option value="wednesday">Wednesday</option>
-                    <option value="thursday">Thursday</option>
-                    <option value="friday">Friday</option>
-                    <option value="saturday">Saturday</option>
-                    <option value="sunday">Sunday</option>
+                <label for="num_visits" class="block text-sm font-medium text-neutral-600 mb-1.5">How many visits to schedule?</label>
+                <select id="num_visits" name="num_visits" class="input">
+                    <option value="4">4 visits</option>
+                    <option value="6">6 visits</option>
+                    <option value="8" selected>8 visits</option>
+                    <option value="12">12 visits</option>
                 </select>
             </div>
         </div>
         
         <div class="mt-4 p-3 bg-brand/10 rounded-lg">
             <p class="text-sm text-ink/70">
-                <strong>Note:</strong> This creates visits for the next 8 weeks. As you complete visits, new ones are added automatically.
+                <strong>Note:</strong> As you complete visits, new ones are added automatically to maintain your schedule.
             </p>
         </div>
     </div>
@@ -116,6 +143,9 @@
     const dateLabel = document.getElementById('date_label');
     const submitText = document.getElementById('submit_text');
     
+    const recurringFrequencyRadios = document.querySelectorAll('input[name="recurring_frequency"]');
+    const customInterval = document.getElementById('custom_interval');
+    
     frequencyRadios.forEach(radio => {
         radio.addEventListener('change', () => {
             if (radio.value === 'recurring' && radio.checked) {
@@ -126,6 +156,16 @@
                 recurringOptions.classList.add('hidden');
                 dateLabel.textContent = 'Visit Date';
                 submitText.textContent = 'Schedule Visit';
+            }
+        });
+    });
+    
+    recurringFrequencyRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (radio.value === 'custom' && radio.checked) {
+                customInterval.classList.remove('hidden');
+            } else {
+                customInterval.classList.add('hidden');
             }
         });
     });
