@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Reschedule Visit - MiKlean{% endblock %}
+
+{% block header %}
+<div class="flex items-center">
+    <a href="{{ url_for('visits.view_visit', visit_id=visit.id) }}" class="mr-4 text-gray-900">←</a>
+    <div>
+        <h1 class="text-2xl font-extrabold text-gray-900">Reschedule</h1>
+        <p class="text-sm text-gray-700">{{ visit.clients.name }}</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}{% endblock %}
+
+{% block content %}
+<form method="POST" class="space-y-4">
+    <div>
+        <label for="scheduled_date" class="block text-sm font-semibold text-gray-600 mb-2">New Date *</label>
+        <input type="date" id="scheduled_date" name="scheduled_date" required
+            value="{{ visit.scheduled_date }}"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none">
+    </div>
+    
+    <div>
+        <label for="scheduled_time" class="block text-sm font-semibold text-gray-600 mb-2">Time (optional)</label>
+        <input type="time" id="scheduled_time" name="scheduled_time"
+            value="{{ visit.scheduled_time[:5] if visit.scheduled_time else '' }}"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none">
+    </div>
+    
+    <button type="submit" 
+        class="w-full bg-yellow-primary text-gray-900 font-bold py-4 rounded-xl hover:bg-yellow-dark transition">
+        Save
+    </button>
+</form>
+{% endblock %}

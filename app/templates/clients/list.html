@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Clients - MiKlean{% endblock %}
+
+{% block header_title %}Clients{% endblock %}
+{% block header_subtitle %}
+<p class="text-sm font-semibold text-gray-700 mt-1">{{ counts.all }} total</p>
+{% endblock %}
+
+{% block content %}
+<!-- Search -->
+<form method="GET" class="mb-4">
+    <input type="hidden" name="type" value="{{ filter_type }}">
+    <input type="text" name="search" value="{{ search }}"
+        placeholder="🔍 Search clients..."
+        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none bg-white">
+</form>
+
+<!-- Filter Tabs -->
+<div class="flex space-x-2 mb-4 overflow-x-auto hide-scrollbar">
+    <a href="{{ url_for('clients.list_clients', type='all') }}" 
+       class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap
+              {% if filter_type == 'all' %}bg-yellow-primary text-gray-900{% else %}bg-white text-gray-600{% endif %}">
+        All ({{ counts.all }})
+    </a>
+    <a href="{{ url_for('clients.list_clients', type='prospect') }}" 
+       class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap
+              {% if filter_type == 'prospect' %}bg-yellow-primary text-gray-900{% else %}bg-white text-gray-600{% endif %}">
+        Prospects ({{ counts.prospect }})
+    </a>
+    <a href="{{ url_for('clients.list_clients', type='client') }}" 
+       class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap
+              {% if filter_type == 'client' %}bg-yellow-primary text-gray-900{% else %}bg-white text-gray-600{% endif %}">
+        Clients ({{ counts.client }})
+    </a>
+</div>
+
+<!-- Client List -->
+{% if clients %}
+<div class="space-y-3">
+    {% for client in clients %}
+    <a href="{{ url_for('clients.view_client', client_id=client.id) }}" class="card block">
+        <div class="flex justify-between items-center">
+            <div>
+                <h3 class="font-bold text-gray-900">{{ client.name }}</h3>
+                <p class="text-sm text-gray-600">{{ client.phone }}</p>
+            </div>
+            <span class="badge badge-{{ client.type }}">{{ client.type|capitalize }}</span>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-12">
+    <p class="text-4xl mb-4">👥</p>
+    <p class="text-gray-600 font-semibold">No clients yet</p>
+    <p class="text-sm text-gray-500 mt-2">Add your first prospect to get started</p>
+</div>
+{% endif %}
+
+<!-- Floating Action Button -->
+<a href="{{ url_for('clients.new_client') }}" 
+   class="fixed bottom-24 right-6 w-14 h-14 bg-yellow-primary rounded-full flex items-center justify-center shadow-lg text-2xl hover:bg-yellow-dark transition">
+    +
+</a>
+{% endblock %}

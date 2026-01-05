@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Settings - MiKlean{% endblock %}
+
+{% block header_title %}Settings{% endblock %}
+
+{% block content %}
+<!-- Business Info -->
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">BUSINESS INFO</p>
+<div class="card mb-4">
+    <a href="{{ url_for('settings.business_info') }}" class="flex items-center justify-between py-3 border-b border-gray-100">
+        <div>
+            <p class="font-semibold text-gray-900">Business Name</p>
+            <p class="text-sm text-gray-600">{{ profile.business_name or 'Not set' }}</p>
+        </div>
+        <span class="text-gray-400">→</span>
+    </a>
+    <a href="{{ url_for('settings.business_info') }}" class="flex items-center justify-between py-3 border-b border-gray-100">
+        <div>
+            <p class="font-semibold text-gray-900">Phone</p>
+            <p class="text-sm text-gray-600">{{ profile.business_phone or 'Not set' }}</p>
+        </div>
+        <span class="text-gray-400">→</span>
+    </a>
+    <a href="{{ url_for('settings.upload_logo') }}" class="flex items-center justify-between py-3">
+        <div>
+            <p class="font-semibold text-gray-900">Logo</p>
+            <p class="text-sm text-gray-600">{% if profile.business_logo_url %}Uploaded{% else %}Not set{% endif %}</p>
+        </div>
+        <span class="text-gray-400">→</span>
+    </a>
+</div>
+
+<!-- Payment -->
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">PAYMENT INSTRUCTIONS</p>
+<div class="card mb-4">
+    <a href="{{ url_for('settings.payment_instructions') }}" class="flex items-center justify-between py-3">
+        <div class="flex-1">
+            <p class="font-semibold text-gray-900">Payment Info</p>
+            <p class="text-sm text-gray-600">{{ profile.payment_instructions[:50] + '...' if profile.payment_instructions and profile.payment_instructions|length > 50 else profile.payment_instructions or 'Not set' }}</p>
+        </div>
+        <span class="text-gray-400">→</span>
+    </a>
+</div>
+
+<!-- Connections -->
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">CONNECTIONS</p>
+<div class="card mb-4">
+    <div class="flex items-center justify-between py-3">
+        <div>
+            <p class="font-semibold text-gray-900">Google Calendar</p>
+            <p class="text-sm text-gray-600">
+                {% if profile.google_access_token %}
+                ✓ Connected
+                {% else %}
+                Not connected
+                {% endif %}
+            </p>
+        </div>
+        {% if profile.google_access_token %}
+        <form method="POST" action="{{ url_for('settings.google_disconnect') }}">
+            <button type="submit" class="text-red-600 text-sm font-semibold">Disconnect</button>
+        </form>
+        {% else %}
+        <a href="{{ url_for('settings.google_connect') }}" class="text-blue-600 text-sm font-semibold">Connect</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Help & Support -->
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">HELP & SUPPORT</p>
+<div class="card mb-4">
+    <a href="{{ url_for('help.index') }}" class="flex items-center justify-between py-3 border-b border-gray-100">
+        <div>
+            <p class="font-semibold text-gray-900">Help Center</p>
+            <p class="text-sm text-gray-600">Tutorials, FAQ, and support</p>
+        </div>
+        <span class="text-gray-400">→</span>
+    </a>
+    <a href="mailto:info@untitledpublishers.com" class="flex items-center justify-between py-3">
+        <div>
+            <p class="font-semibold text-gray-900">Contact Support</p>
+            <p class="text-sm text-gray-600">info@untitledpublishers.com</p>
+        </div>
+        <span class="text-gray-400">→</span>
+    </a>
+</div>
+
+<!-- Account -->
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">ACCOUNT</p>
+<div class="card mb-4">
+    <div class="py-3 border-b border-gray-100">
+        <p class="font-semibold text-gray-900">Email</p>
+        <p class="text-sm text-gray-600">{{ user_email }}</p>
+    </div>
+    <a href="{{ url_for('auth.logout') }}" class="flex items-center justify-between py-3 text-red-600">
+        <span class="font-semibold">Sign Out</span>
+        <span>→</span>
+    </a>
+</div>
+{% endblock %}

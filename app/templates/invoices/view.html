@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ invoice.invoice_number }} - MiKlean{% endblock %}
+
+{% block header %}
+<div class="flex items-center">
+    <a href="{{ url_for('clients.view_client', client_id=invoice.client_id) }}" class="mr-4 text-gray-900">←</a>
+    <div>
+        <h1 class="text-2xl font-extrabold text-gray-900">{{ invoice.invoice_number }}</h1>
+        <p class="text-sm text-gray-700">{{ invoice.clients.name }}</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <span class="badge badge-{{ invoice.status }}">{{ invoice.status|capitalize }}</span>
+    {% if invoice.sent_at %}<span class="text-sm text-gray-500 ml-2">Sent {{ invoice.sent_at[:10] }}</span>{% endif %}
+    {% if invoice.paid_at %}<span class="text-sm text-gray-500 ml-2">Paid {{ invoice.paid_at[:10] }}</span>{% endif %}
+</div>
+
+<div class="card mb-4">
+    <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">SERVICES</p>
+    {% for visit in visits %}
+    <div class="flex justify-between py-2 {% if not loop.last %}border-b border-gray-100{% endif %}">
+        <div>
+            <p class="text-gray-900">{{ visit.scheduled_date }}</p>
+            {% if visit.completion_notes %}<p class="text-sm text-gray-600">{{ visit.completion_notes }}</p>{% endif %}
+        </div>
+        <span class="font-semibold text-gray-900">${{ "%.2f"|format(visit.price) }}</span>
+    </div>
+    {% endfor %}
+    <div class="border-t border-gray-200 mt-4 pt-4">
+        <div class="flex justify-between text-lg font-bold">
+            <span>Total</span>
+            <span>${{ "%.2f"|format(invoice.total) }}</span>
+        </div>
+    </div>
+</div>
+
+{% if invoice.status == 'draft' %}
+<a href="{{ url_for('invoices.preview_invoice', invoice_id=invoice.id) }}" class="block w-full text-center bg-yellow-primary text-gray-900 font-bold py-4 rounded-xl">Preview & Send</a>
+{% elif invoice.status == 'sent' %}
+<form method="POST" action="{{ url_for('invoices.mark_paid', invoice_id=invoice.id) }}" class="mb-2">
+    <button type="submit" class="w-full bg-green-500 text-white font-bold py-4 rounded-xl">✓ Mark as Paid</button>
+</form>
+<a href="{{ url_for('invoices.send_invoice', invoice_id=invoice.id) }}" class="block w-full text-center border-2 border-gray-900 text-gray-900 font-bold py-4 rounded-xl">Resend</a>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Logo - MiKlean{% endblock %}
+
+{% block header %}
+<div class="flex items-center">
+    <a href="{{ url_for('settings.index') }}" class="mr-4 text-gray-900">←</a>
+    <h1 class="text-2xl font-extrabold text-gray-900">Business Logo</h1>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}{% endblock %}
+
+{% block content %}
+{% if profile.business_logo_url %}
+<div class="mb-6">
+    <p class="text-sm font-semibold text-gray-600 mb-2">Current Logo</p>
+    <img src="{{ profile.business_logo_url }}" alt="Business logo" class="max-w-48 rounded-xl border">
+</div>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data" class="space-y-4">
+    <div>
+        <label for="logo" class="block text-sm font-semibold text-gray-600 mb-2">
+            {% if profile.business_logo_url %}Replace Logo{% else %}Upload Logo{% endif %}
+        </label>
+        <input type="file" id="logo" name="logo" accept="image/png,image/jpeg,image/gif"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none">
+        <p class="text-sm text-gray-500 mt-2">PNG, JPG, or GIF. Max 2MB.</p>
+    </div>
+    
+    <button type="submit" 
+        class="w-full bg-yellow-primary text-gray-900 font-bold py-4 rounded-xl hover:bg-yellow-dark transition">
+        Upload
+    </button>
+</form>
+{% endblock %}

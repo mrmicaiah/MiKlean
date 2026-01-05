@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Getting Started - MiKlean{% endblock %}
+
+{% block header %}
+<div class="flex items-center">
+    <a href="{{ url_for('help.index') }}" class="mr-4 text-gray-900">←</a>
+    <h1 class="text-2xl font-extrabold text-gray-900">Getting Started</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+<p class="text-gray-600 mb-6">Follow these steps to get up and running with MiKlean.</p>
+
+<!-- Step 1 -->
+<div class="card mb-4">
+    <div class="flex items-start">
+        <div class="w-8 h-8 bg-yellow-primary rounded-full flex items-center justify-center font-bold text-gray-900 mr-4 flex-shrink-0">1</div>
+        <div>
+            <h3 class="font-bold text-gray-900 mb-1">Add a Prospect</h3>
+            <p class="text-gray-600 text-sm mb-3">When someone calls asking for a quote, add them as a prospect with their name, phone, and address.</p>
+            <a href="{{ url_for('clients.new_client') }}" class="text-yellow-dark font-semibold text-sm">+ Add your first prospect →</a>
+        </div>
+    </div>
+</div>
+
+<!-- Step 2 -->
+<div class="card mb-4">
+    <div class="flex items-start">
+        <div class="w-8 h-8 bg-yellow-primary rounded-full flex items-center justify-center font-bold text-gray-900 mr-4 flex-shrink-0">2</div>
+        <div>
+            <h3 class="font-bold text-gray-900 mb-1">Create an Estimate</h3>
+            <p class="text-gray-600 text-sm mb-3">After visiting their home, create an estimate with your service description, price, and how often you'll clean.</p>
+            <div class="bg-gray-100 rounded-lg p-3 text-sm">
+                <p class="text-gray-700">From the prospect's page, tap <strong>"Create Estimate"</strong></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Step 3 -->
+<div class="card mb-4">
+    <div class="flex items-start">
+        <div class="w-8 h-8 bg-yellow-primary rounded-full flex items-center justify-center font-bold text-gray-900 mr-4 flex-shrink-0">3</div>
+        <div>
+            <h3 class="font-bold text-gray-900 mb-1">Send the Estimate</h3>
+            <p class="text-gray-600 text-sm mb-3">Send via email or text. Your client gets a professional estimate with an "Accept" button.</p>
+            <div class="bg-gray-100 rounded-lg p-3 text-sm">
+                <p class="text-gray-700">Preview it first, then choose <strong>Email</strong> or <strong>Text</strong></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Step 4 -->
+<div class="card mb-4">
+    <div class="flex items-start">
+        <div class="w-8 h-8 bg-yellow-primary rounded-full flex items-center justify-center font-bold text-gray-900 mr-4 flex-shrink-0">4</div>
+        <div>
+            <h3 class="font-bold text-gray-900 mb-1">Client Accepts → Schedule Visits</h3>
+            <p class="text-gray-600 text-sm mb-3">When they accept, they become a client. Add them to your schedule and MiKlean creates 8 weeks of visits automatically.</p>
+            <div class="bg-gray-100 rounded-lg p-3 text-sm">
+                <p class="text-gray-700">Pick the start date and we handle the rest</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Step 5 -->
+<div class="card mb-4">
+    <div class="flex items-start">
+        <div class="w-8 h-8 bg-yellow-primary rounded-full flex items-center justify-center font-bold text-gray-900 mr-4 flex-shrink-0">5</div>
+        <div>
+            <h3 class="font-bold text-gray-900 mb-1">Complete Visits</h3>
+            <p class="text-gray-600 text-sm mb-3">Check the Today page each morning to see your schedule. After each cleaning, tap "Mark Complete."</p>
+            <div class="bg-gray-100 rounded-lg p-3 text-sm">
+                <p class="text-gray-700">Add notes if something special happened (shows on invoice)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Step 6 -->
+<div class="card mb-4">
+    <div class="flex items-start">
+        <div class="w-8 h-8 bg-yellow-primary rounded-full flex items-center justify-center font-bold text-gray-900 mr-4 flex-shrink-0">6</div>
+        <div>
+            <h3 class="font-bold text-gray-900 mb-1">Invoice Monthly</h3>
+            <p class="text-gray-600 text-sm mb-3">At the end of the month, create an invoice for all completed visits. Send it via email with a PDF attached.</p>
+            <div class="bg-gray-100 rounded-lg p-3 text-sm">
+                <p class="text-gray-700">From client page, tap <strong>"Invoice for Month"</strong></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tips -->
+<div class="bg-yellow-light rounded-xl p-4 mt-6">
+    <h3 class="font-bold text-gray-900 mb-2">💡 Pro Tips</h3>
+    <ul class="text-sm text-gray-700 space-y-2">
+        <li>• <strong>Set up your business info</strong> in Settings so it shows on estimates and invoices</li>
+        <li>• <strong>Add payment instructions</strong> (Venmo, Zelle, etc.) so clients know how to pay</li>
+        <li>• <strong>Use the notes field</strong> to remember gate codes, pet names, and special instructions</li>
+    </ul>
+</div>
+
+<!-- CTA -->
+<div class="mt-6">
+    <a href="{{ url_for('clients.new_client') }}" 
+       class="block w-full text-center bg-yellow-primary text-gray-900 font-bold py-4 rounded-xl">
+        + Add Your First Prospect
+    </a>
+</div>
+{% endblock %}

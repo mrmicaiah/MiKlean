@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Create Invoice - MiKlean{% endblock %}
+
+{% block header %}
+<div class="flex items-center">
+    <a href="{{ url_for('clients.view_client', client_id=client.id) }}" class="mr-4 text-gray-900">←</a>
+    <div>
+        <h1 class="text-2xl font-extrabold text-gray-900">Invoice</h1>
+        <p class="text-sm text-gray-700">{{ client.name }}</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}{% endblock %}
+
+{% block content %}
+{% if visits %}
+<form method="POST">
+    <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">COMPLETED VISITS</p>
+    
+    <div class="space-y-2 mb-4">
+        {% for visit in visits %}
+        <label class="card block cursor-pointer">
+            <div class="flex items-start">
+                <input type="checkbox" name="visits" value="{{ visit.id }}" checked
+                    class="w-5 h-5 mt-1 rounded border-gray-300 text-yellow-primary focus:ring-yellow-primary">
+                <div class="ml-3 flex-1">
+                    <div class="flex justify-between">
+                        <span class="font-semibold text-gray-900">{{ visit.scheduled_date }}</span>
+                        <span class="font-semibold text-gray-900">${{ "%.2f"|format(visit.price) }}</span>
+                    </div>
+                    {% if visit.completion_notes %}
+                    <p class="text-sm text-gray-600 mt-1">{{ visit.completion_notes }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </label>
+        {% endfor %}
+    </div>
+    
+    <div class="card mb-4">
+        <div class="flex justify-between text-lg font-bold">
+            <span>Total</span>
+            <span id="total">${{ "%.2f"|format(visits|sum(attribute='price')) }}</span>
+        </div>
+    </div>
+    
+    <button type="submit" 
+        class="w-full bg-yellow-primary text-gray-900 font-bold py-4 rounded-xl hover:bg-yellow-dark transition">
+        Generate Invoice
+    </button>
+</form>
+
+<script>
+    // Update total when checkboxes change
+    document.querySelectorAll('input[name="visits"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateTotal);
+    });
+    
+    function updateTotal() {
+        const checked = document.querySelectorAll('input[name="visits"]:checked');
+        let total = 0;
+        checked.forEach(cb => {
+            const priceText = cb.closest('label').querySelector('.font-semibold:last-child').textContent;
+            total += parseFloat(priceText.replace('$', ''));
+        });
+        document.getElementById('total').textContent = '$' + total.toFixed(2);
+    }
+</script>
+{% else %}
+<div class="text-center py-12">
+    <p class="text-4xl mb-4">📋</p>
+    <p class="text-gray-600 font-semibold">No completed visits to invoice</p>
+    <p class="text-sm text-gray-500 mt-2">Complete some visits first, then come back to invoice them.</p>
+</div>
+{% endif %}
+{% endblock %}

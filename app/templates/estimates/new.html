@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Create Estimate - MiKlean{% endblock %}
+
+{% block header %}
+<div class="flex items-center">
+    <a href="{{ url_for('clients.view_client', client_id=client.id) }}" class="mr-4 text-gray-900">←</a>
+    <div>
+        <h1 class="text-2xl font-extrabold text-gray-900">Create Estimate</h1>
+        <p class="text-sm text-gray-700">for {{ client.name }}</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}{% endblock %}
+
+{% block content %}
+<form method="POST" class="space-y-4">
+    <div>
+        <label for="description" class="block text-sm font-semibold text-gray-600 mb-2">Service Description *</label>
+        <textarea id="description" name="description" rows="4" required
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none"
+            placeholder="Describe what you'll do for this client...">{{ description or '' }}</textarea>
+    </div>
+    
+    <div>
+        <label for="price_per_visit" class="block text-sm font-semibold text-gray-600 mb-2">Price Per Visit *</label>
+        <input type="text" id="price_per_visit" name="price_per_visit" required
+            value="{{ price_per_visit or '' }}"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none"
+            placeholder="$150.00">
+    </div>
+    
+    <div>
+        <label class="block text-sm font-semibold text-gray-600 mb-2">Frequency *</label>
+        <div class="grid grid-cols-4 gap-2">
+            <label class="relative">
+                <input type="radio" name="frequency" value="weekly" class="peer sr-only" {% if frequency == 'weekly' %}checked{% endif %}>
+                <div class="px-3 py-3 text-center border-2 border-gray-200 rounded-xl cursor-pointer peer-checked:border-yellow-primary peer-checked:bg-yellow-light">
+                    <span class="text-sm font-semibold">Weekly</span>
+                </div>
+            </label>
+            <label class="relative">
+                <input type="radio" name="frequency" value="biweekly" class="peer sr-only" {% if frequency == 'biweekly' %}checked{% endif %}>
+                <div class="px-3 py-3 text-center border-2 border-gray-200 rounded-xl cursor-pointer peer-checked:border-yellow-primary peer-checked:bg-yellow-light">
+                    <span class="text-sm font-semibold">Bi-Wk</span>
+                </div>
+            </label>
+            <label class="relative">
+                <input type="radio" name="frequency" value="monthly" class="peer sr-only" {% if frequency == 'monthly' %}checked{% endif %}>
+                <div class="px-3 py-3 text-center border-2 border-gray-200 rounded-xl cursor-pointer peer-checked:border-yellow-primary peer-checked:bg-yellow-light">
+                    <span class="text-sm font-semibold">Monthly</span>
+                </div>
+            </label>
+            <label class="relative">
+                <input type="radio" name="frequency" value="one_time" class="peer sr-only" {% if frequency == 'one_time' %}checked{% endif %}>
+                <div class="px-3 py-3 text-center border-2 border-gray-200 rounded-xl cursor-pointer peer-checked:border-yellow-primary peer-checked:bg-yellow-light">
+                    <span class="text-sm font-semibold">One-Time</span>
+                </div>
+            </label>
+        </div>
+    </div>
+    
+    <div>
+        <label for="preferred_day" class="block text-sm font-semibold text-gray-600 mb-2">Preferred Day</label>
+        <select id="preferred_day" name="preferred_day"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none">
+            <option value="">No preference</option>
+            <option value="monday" {% if preferred_day == 'monday' %}selected{% endif %}>Monday</option>
+            <option value="tuesday" {% if preferred_day == 'tuesday' %}selected{% endif %}>Tuesday</option>
+            <option value="wednesday" {% if preferred_day == 'wednesday' %}selected{% endif %}>Wednesday</option>
+            <option value="thursday" {% if preferred_day == 'thursday' %}selected{% endif %}>Thursday</option>
+            <option value="friday" {% if preferred_day == 'friday' %}selected{% endif %}>Friday</option>
+            <option value="saturday" {% if preferred_day == 'saturday' %}selected{% endif %}>Saturday</option>
+            <option value="sunday" {% if preferred_day == 'sunday' %}selected{% endif %}>Sunday</option>
+        </select>
+    </div>
+    
+    <div>
+        <label for="preferred_time" class="block text-sm font-semibold text-gray-600 mb-2">Preferred Time</label>
+        <select id="preferred_time" name="preferred_time"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none">
+            <option value="">No preference</option>
+            <option value="Morning" {% if preferred_time == 'Morning' %}selected{% endif %}>Morning</option>
+            <option value="Afternoon" {% if preferred_time == 'Afternoon' %}selected{% endif %}>Afternoon</option>
+            <option value="Evening" {% if preferred_time == 'Evening' %}selected{% endif %}>Evening</option>
+        </select>
+    </div>
+    
+    <div id="monthly-rate-option" class="flex items-center">
+        <input type="checkbox" id="show_monthly_rate" name="show_monthly_rate" 
+            {% if show_monthly_rate is not defined or show_monthly_rate %}checked{% endif %}
+            class="w-5 h-5 rounded border-gray-300 text-yellow-primary focus:ring-yellow-primary">
+        <label for="show_monthly_rate" class="ml-3 text-gray-700">Show monthly rate on estimate</label>
+    </div>
+    
+    <button type="submit" 
+        class="w-full bg-yellow-primary text-gray-900 font-bold py-4 rounded-xl hover:bg-yellow-dark transition">
+        Save Estimate
+    </button>
+</form>
+
+<script>
+    // Hide monthly rate option for one-time frequency
+    document.querySelectorAll('input[name="frequency"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            const monthlyOption = document.getElementById('monthly-rate-option');
+            if (radio.value === 'one_time' && radio.checked) {
+                monthlyOption.style.display = 'none';
+            } else if (radio.checked) {
+                monthlyOption.style.display = 'flex';
+            }
+        });
+    });
+</script>
+{% endblock %}

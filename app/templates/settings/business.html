@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Business Info - MiKlean{% endblock %}
+
+{% block header %}
+<div class="flex items-center">
+    <a href="{{ url_for('settings.index') }}" class="mr-4 text-gray-900">←</a>
+    <h1 class="text-2xl font-extrabold text-gray-900">Business Info</h1>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}{% endblock %}
+
+{% block content %}
+<form method="POST" class="space-y-4">
+    <div>
+        <label for="business_name" class="block text-sm font-semibold text-gray-600 mb-2">Business Name</label>
+        <input type="text" id="business_name" name="business_name"
+            value="{{ profile.business_name or '' }}"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none"
+            placeholder="Sparkle Clean Co.">
+    </div>
+    
+    <div>
+        <label for="business_phone" class="block text-sm font-semibold text-gray-600 mb-2">Business Phone</label>
+        <input type="tel" id="business_phone" name="business_phone"
+            value="{{ profile.business_phone or '' }}"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none"
+            placeholder="(555) 123-4567">
+    </div>
+    
+    <button type="submit" 
+        class="w-full bg-yellow-primary text-gray-900 font-bold py-4 rounded-xl hover:bg-yellow-dark transition">
+        Save
+    </button>
+</form>
+{% endblock %}

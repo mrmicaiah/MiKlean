@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>{% block title %}MiKlean{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts - Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'yellow-primary': '#FFC107',
+                        'yellow-light': '#FFECB3',
+                        'yellow-dark': '#FFA000',
+                        'off-white': '#FAFAFA',
+                        'blue-accent': '#4FC3F7',
+                        'blue-light': '#B3E5FC',
+                    },
+                    fontFamily: {
+                        'sans': ['Nunito', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom styles */
+        html, body {
+            font-family: 'Nunito', system-ui, sans-serif;
+            background-color: #FAFAFA;
+            min-height: 100vh;
+        }
+        
+        /* Safe area for notched phones */
+        .safe-top {
+            padding-top: env(safe-area-inset-top, 20px);
+        }
+        
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+        
+        /* Hide scrollbar but allow scrolling */
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Touch-friendly tap targets */
+        .tap-target {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Card styles */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid #F0F0F0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        /* Button press effect */
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* Status badges */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .badge-scheduled {
+            background: #B3E5FC;
+            color: #0277BD;
+        }
+        .badge-completed {
+            background: #C8E6C9;
+            color: #2E7D32;
+        }
+        .badge-prospect {
+            background: #B3E5FC;
+            color: #0277BD;
+        }
+        .badge-client {
+            background: #FFECB3;
+            color: #FFA000;
+        }
+        .badge-sent {
+            background: #FFECB3;
+            color: #FFA000;
+        }
+        .badge-paid {
+            background: #C8E6C9;
+            color: #2E7D32;
+        }
+        .badge-draft {
+            background: #F0F0F0;
+            color: #666;
+        }
+        .badge-accepted {
+            background: #C8E6C9;
+            color: #2E7D32;
+        }
+    </style>
+    
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-off-white min-h-screen {% block body_class %}{% endblock %}">
+    {% block body %}
+    <!-- Header -->
+    <header class="bg-yellow-primary safe-top">
+        <div class="px-5 py-5">
+            {% block header %}
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-extrabold text-gray-900">✨ {% block header_title %}MiKlean{% endblock %}</h1>
+                    {% block header_subtitle %}{% endblock %}
+                </div>
+                {% block header_actions %}{% endblock %}
+            </div>
+            {% endblock %}
+        </div>
+    </header>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="px-4 pt-4">
+        {% for category, message in messages %}
+        <div class="mb-2 p-4 rounded-xl {% if category == 'error' %}bg-red-100 text-red-800{% elif category == 'success' %}bg-green-100 text-green-800{% elif category == 'warning' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    
+    <!-- Main Content -->
+    <main class="{% block main_class %}px-4 py-4 pb-24{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Bottom Navigation -->
+    {% block bottom_nav %}
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-bottom">
+        <div class="flex justify-around py-2">
+            <a href="{{ url_for('main.today') }}" class="flex flex-col items-center py-2 px-4 {% if request.endpoint == 'main.today' %}text-yellow-dark{% else %}text-gray-400{% endif %}">
+                <span class="text-xl">🏠</span>
+                <span class="text-xs font-semibold">Today</span>
+            </a>
+            <a href="{{ url_for('clients.list_clients') }}" class="flex flex-col items-center py-2 px-4 {% if request.endpoint and 'clients' in request.endpoint %}text-yellow-dark{% else %}text-gray-400{% endif %}">
+                <span class="text-xl">👥</span>
+                <span class="text-xs font-semibold">Clients</span>
+            </a>
+            <a href="{{ url_for('main.calendar') }}" class="flex flex-col items-center py-2 px-4 {% if request.endpoint == 'main.calendar' %}text-yellow-dark{% else %}text-gray-400{% endif %}">
+                <span class="text-xl">📅</span>
+                <span class="text-xs font-semibold">Calendar</span>
+            </a>
+            <a href="{{ url_for('settings.index') }}" class="flex flex-col items-center py-2 px-4 {% if request.endpoint and 'settings' in request.endpoint %}text-yellow-dark{% else %}text-gray-400{% endif %}">
+                <span class="text-xl">⚙️</span>
+                <span class="text-xs font-semibold">Settings</span>
+            </a>
+        </div>
+    </nav>
+    {% endblock %}
+    {% endblock %}
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

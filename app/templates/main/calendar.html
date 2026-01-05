@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Calendar - MiKlean{% endblock %}
+
+{% block header_title %}Calendar{% endblock %}
+{% block header_subtitle %}
+<p class="text-sm font-semibold text-gray-700 mt-1">{{ selected_date.strftime('%B %Y') }}</p>
+{% endblock %}
+
+{% block content %}
+<!-- Month Navigation -->
+<div class="flex justify-between items-center mb-4">
+    <a href="{{ url_for('main.calendar', date_str=prev_month.strftime('%Y-%m-%d')) }}" 
+       class="px-4 py-2 text-gray-600 font-semibold">← Prev</a>
+    <span class="font-bold text-gray-900">{{ selected_date.strftime('%B %Y') }}</span>
+    <a href="{{ url_for('main.calendar', date_str=next_month.strftime('%Y-%m-%d')) }}" 
+       class="px-4 py-2 text-gray-600 font-semibold">Next →</a>
+</div>
+
+<!-- Calendar Grid -->
+<div class="card mb-4">
+    <!-- Day Headers -->
+    <div class="grid grid-cols-7 text-center text-xs font-bold text-gray-500 mb-2">
+        <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+    </div>
+    
+    <!-- Calendar Days -->
+    <div class="grid grid-cols-7 gap-1">
+        {# Empty cells before first day #}
+        {% for i in range(first_weekday) %}
+        <div class="h-10"></div>
+        {% endfor %}
+        
+        {# Days of month #}
+        {% for day in range(1, days_in_month + 1) %}
+            {% set current_date = first_of_month.replace(day=day) %}
+            {% set date_str = current_date.strftime('%Y-%m-%d') %}
+            {% set has_visits = date_str in visits_by_date %}
+            {% set is_selected = current_date == selected_date %}
+            {% set is_today = current_date == today %}
+            
+            <a href="{{ url_for('main.calendar', date_str=date_str) }}" 
+               class="h-10 flex flex-col items-center justify-center rounded-lg 
+                      {% if is_selected %}bg-yellow-primary{% elif is_today %}bg-yellow-light{% else %}hover:bg-gray-100{% endif %}">
+                <span class="text-sm {% if is_selected %}font-bold{% endif %}">{{ day }}</span>
+                {% if has_visits %}
+                <span class="w-1.5 h-1.5 rounded-full {% if is_selected %}bg-gray-900{% else %}bg-yellow-dark{% endif %}"></span>
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Selected Day's Visits -->
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
+    {{ selected_date.strftime('%A, %B %d') }}
+</p>
+
+{% if selected_visits %}
+<div class="space-y-3">
+    {% for visit in selected_visits %}
+    <a href="{{ url_for('visits.view_visit', visit_id=visit.id) }}" class="card block">
+        <div class="flex justify-between items-start">
+            <h3 class="font-bold text-gray-900">{{ visit.clients.name }}</h3>
+            <span class="badge badge-{{ visit.status }}">{{ visit.status|capitalize }}</span>
+        </div>
+        {% if visit.scheduled_time %}
+        <p class="text-sm text-gray-600">🕐 {{ visit.scheduled_time[:5] }}</p>
+        {% endif %}
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-8 text-gray-500">
+    No visits scheduled
+</div>
+{% endif %}
+{% endblock %}

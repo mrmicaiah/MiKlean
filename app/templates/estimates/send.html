@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Send Estimate - MiKlean{% endblock %}
+
+{% block header %}
+<div class="flex items-center">
+    <a href="{{ url_for('estimates.view_estimate', estimate_id=estimate.id) }}" class="mr-4 text-gray-900">←</a>
+    <h1 class="text-2xl font-extrabold text-gray-900">Send Estimate</h1>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <p class="font-semibold text-gray-900">${{ "%.2f"|format(estimate.price_per_visit) }}/visit</p>
+    <p class="text-gray-600">{{ client.name }} - {{ estimate.frequency|capitalize }}</p>
+</div>
+
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">SEND VIA</p>
+
+<form method="POST" class="space-y-3">
+    <button type="submit" name="method" value="email" 
+        class="w-full card text-left {% if client.email %}{% else %}opacity-50{% endif %}"
+        {% if not client.email %}disabled{% endif %}>
+        <div class="flex items-center">
+            <span class="text-2xl mr-4">✉️</span>
+            <div>
+                <p class="font-semibold text-gray-900">Email</p>
+                <p class="text-sm text-gray-600">{{ client.email or 'No email address' }}</p>
+            </div>
+        </div>
+    </button>
+    
+    <button type="submit" name="method" value="text" class="w-full card text-left">
+        <div class="flex items-center">
+            <span class="text-2xl mr-4">💬</span>
+            <div>
+                <p class="font-semibold text-gray-900">Text Message</p>
+                <p class="text-sm text-gray-600">{{ client.phone }}</p>
+            </div>
+        </div>
+    </button>
+</form>
+
+{% if not client.email %}
+<p class="text-sm text-gray-500 mt-4">
+    <a href="{{ url_for('clients.edit_client', client_id=client.id) }}" class="text-blue-600">Add email address</a> to send via email.
+</p>
+{% endif %}
+{% endblock %}

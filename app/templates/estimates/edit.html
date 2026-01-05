@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Edit Estimate - MiKlean{% endblock %}
+
+{% block header %}
+<div class="flex items-center">
+    <a href="{{ url_for('estimates.view_estimate', estimate_id=estimate.id) }}" class="mr-4 text-gray-900">←</a>
+    <div>
+        <h1 class="text-2xl font-extrabold text-gray-900">Edit Estimate</h1>
+        <p class="text-sm text-gray-700">for {{ estimate.clients.name }}</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}{% endblock %}
+
+{% block content %}
+<form method="POST" class="space-y-4">
+    <div>
+        <label for="description" class="block text-sm font-semibold text-gray-600 mb-2">Service Description *</label>
+        <textarea id="description" name="description" rows="4" required
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none">{{ estimate.description }}</textarea>
+    </div>
+    
+    <div>
+        <label for="price_per_visit" class="block text-sm font-semibold text-gray-600 mb-2">Price Per Visit *</label>
+        <input type="text" id="price_per_visit" name="price_per_visit" required
+            value="{{ '%.2f'|format(estimate.price_per_visit) }}"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none">
+    </div>
+    
+    <div>
+        <label class="block text-sm font-semibold text-gray-600 mb-2">Frequency *</label>
+        <div class="grid grid-cols-4 gap-2">
+            {% for freq in ['weekly', 'biweekly', 'monthly', 'one_time'] %}
+            <label class="relative">
+                <input type="radio" name="frequency" value="{{ freq }}" class="peer sr-only" {% if estimate.frequency == freq %}checked{% endif %}>
+                <div class="px-3 py-3 text-center border-2 border-gray-200 rounded-xl cursor-pointer peer-checked:border-yellow-primary peer-checked:bg-yellow-light">
+                    <span class="text-sm font-semibold">{{ freq.replace('_', '-')|title }}</span>
+                </div>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div>
+        <label for="preferred_day" class="block text-sm font-semibold text-gray-600 mb-2">Preferred Day</label>
+        <select id="preferred_day" name="preferred_day"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none">
+            <option value="">No preference</option>
+            {% for day in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
+            <option value="{{ day }}" {% if estimate.preferred_day == day %}selected{% endif %}>{{ day|capitalize }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div>
+        <label for="preferred_time" class="block text-sm font-semibold text-gray-600 mb-2">Preferred Time</label>
+        <select id="preferred_time" name="preferred_time"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none">
+            <option value="">No preference</option>
+            {% for time in ['Morning', 'Afternoon', 'Evening'] %}
+            <option value="{{ time }}" {% if estimate.preferred_time == time %}selected{% endif %}>{{ time }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div class="flex items-center">
+        <input type="checkbox" id="show_monthly_rate" name="show_monthly_rate" 
+            {% if estimate.show_monthly_rate %}checked{% endif %}
+            class="w-5 h-5 rounded border-gray-300 text-yellow-primary focus:ring-yellow-primary">
+        <label for="show_monthly_rate" class="ml-3 text-gray-700">Show monthly rate on estimate</label>
+    </div>
+    
+    <button type="submit" 
+        class="w-full bg-yellow-primary text-gray-900 font-bold py-4 rounded-xl hover:bg-yellow-dark transition">
+        Save Changes
+    </button>
+</form>
+{% endblock %}

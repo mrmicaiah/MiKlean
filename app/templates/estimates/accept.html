@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accept Estimate - MiKlean</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>html, body { font-family: 'Nunito', sans-serif; }</style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-lg p-6 max-w-md w-full">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">{{ estimate.user_profiles.business_name or 'Cleaning Service' }}</h1>
+            <p class="text-gray-600">Estimate for {{ estimate.clients.name }}</p>
+        </div>
+        
+        <!-- Service -->
+        <div class="mb-4">
+            <p class="text-xs font-bold text-gray-500 uppercase mb-1">Service</p>
+            <p class="text-gray-800 whitespace-pre-wrap">{{ estimate.description }}</p>
+        </div>
+        
+        <!-- Pricing -->
+        <div class="bg-amber-100 rounded-xl p-4 mb-6">
+            <p class="text-2xl font-bold text-gray-900">${{ "%.2f"|format(estimate.price_per_visit) }}<span class="text-base font-normal"> / visit</span></p>
+            {% if monthly_rate and estimate.show_monthly_rate %}
+            <p class="text-gray-700">${{ "%.2f"|format(monthly_rate) }} / month</p>
+            {% endif %}
+            <p class="text-gray-600 mt-1">{{ estimate.frequency|capitalize }}</p>
+        </div>
+        
+        <!-- Accept Button -->
+        <form method="POST" action="{{ url_for('estimates.confirm_accept_estimate', estimate_id=estimate.id, token=token) }}">
+            <button type="submit" class="w-full bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold py-4 rounded-xl transition">
+                ✓ Accept Estimate
+            </button>
+        </form>
+        
+        <!-- Contact -->
+        {% if estimate.user_profiles.business_phone %}
+        <p class="text-sm text-gray-500 text-center mt-4">Questions? Call {{ estimate.user_profiles.business_phone }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
