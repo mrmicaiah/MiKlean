@@ -18,19 +18,33 @@
 </div>
 {% endif %}
 
-<form method="POST" enctype="multipart/form-data" class="space-y-4">
+<form method="POST" class="space-y-4">
     <div>
-        <label for="logo" class="block text-sm font-semibold text-gray-600 mb-2">
-            {% if profile.business_logo_url %}Replace Logo{% else %}Upload Logo{% endif %}
+        <label for="logo_url" class="block text-sm font-semibold text-gray-600 mb-2">
+            Logo URL
         </label>
-        <input type="file" id="logo" name="logo" accept="image/png,image/jpeg,image/gif"
+        <input type="url" id="logo_url" name="logo_url" 
+            value="{{ profile.business_logo_url or '' }}"
+            placeholder="https://example.com/your-logo.png"
             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-primary focus:outline-none">
-        <p class="text-sm text-gray-500 mt-2">PNG, JPG, or GIF. Max 2MB.</p>
+        <p class="text-sm text-gray-500 mt-2">Paste a link to your logo image. You can use Google Drive, your website, or any image hosting service.</p>
+    </div>
+    
+    <div class="bg-blue-50 p-4 rounded-xl">
+        <p class="text-sm text-blue-800 font-semibold mb-1">💡 Tip: Using Google Drive?</p>
+        <p class="text-sm text-blue-700">Upload your logo to Google Drive, right-click → Share → "Anyone with link", then copy the link.</p>
     </div>
     
     <button type="submit" 
         class="w-full bg-yellow-primary text-gray-900 font-bold py-4 rounded-xl hover:bg-yellow-dark transition">
-        Upload
+        Save Logo
     </button>
+    
+    {% if profile.business_logo_url %}
+    <button type="submit" name="logo_url" value=""
+        class="w-full border-2 border-gray-300 text-gray-600 font-bold py-4 rounded-xl hover:bg-gray-100 transition">
+        Remove Logo
+    </button>
+    {% endif %}
 </form>
 {% endblock %}
