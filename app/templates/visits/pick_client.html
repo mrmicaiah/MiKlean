@@ -2,14 +2,19 @@
 {% block title %}Schedule Visit - MiKlean{% endblock %}
 
 {% block header %}
-<div class="flex items-center">
-    <a href="{{ url_for('main.calendar') }}" class="mr-3 text-ink/60 hover:text-ink">
-        <i data-lucide="x" class="w-6 h-6"></i>
-    </a>
-    <div>
-        <h1 class="text-xl font-bold text-ink">Schedule Visit</h1>
-        <p class="text-sm text-ink/60">Select a client</p>
+<div class="flex items-center justify-between">
+    <div class="flex items-center">
+        <a href="{{ url_for('main.calendar') }}" class="mr-3 text-ink/60 hover:text-ink">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </a>
+        <div>
+            <h1 class="text-xl font-bold text-ink">Schedule Visit</h1>
+            <p class="text-sm text-ink/60">Select a client</p>
+        </div>
     </div>
+    <a href="{{ url_for('clients.new_client', next='schedule') }}" class="fab">
+        <i data-lucide="plus" class="w-6 h-6 text-ink stroke-[2.5]"></i>
+    </a>
 </div>
 {% endblock %}
 
@@ -46,9 +51,14 @@
     <div class="w-14 h-14 bg-brand/20 rounded-full flex items-center justify-center mx-auto mb-3">
         <i data-lucide="users" class="w-7 h-7 text-brand"></i>
     </div>
+    {% if search %}
+    <h3 class="text-lg font-semibold text-ink mb-1">No clients found</h3>
+    <p class="text-neutral-500 text-sm mb-4">No one matches "{{ search }}"</p>
+    {% else %}
     <h3 class="text-lg font-semibold text-ink mb-1">No clients yet</h3>
     <p class="text-neutral-500 text-sm mb-4">Add a client first, then schedule visits</p>
-    <a href="{{ url_for('clients.new_client') }}" class="btn-brand inline-block px-6">
+    {% endif %}
+    <a href="{{ url_for('clients.new_client', next='schedule') }}" class="btn-brand inline-block px-6">
         + Add Client
     </a>
 </div>
