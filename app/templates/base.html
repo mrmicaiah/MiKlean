@@ -51,25 +51,31 @@
         }
         
         html, body {
-            background-color: #FAFAFA;
+            background-color: #F5F5F5;
             min-height: 100vh;
         }
         
-        /* Clean white cards with subtle border */
+        /* Cards with left accent border */
         .card {
             background: white;
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 18px;
-            border: 1px solid #E5E5E5;
+            border-left: 4px solid #0A0A0A;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
             transition: all 0.15s ease;
         }
         
         .card-interactive:hover {
-            border-color: #D4D4D4;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
         .card-interactive:active {
             transform: scale(0.99);
+        }
+        
+        /* Card with yellow accent */
+        .card-brand {
+            border-left-color: #FFC107;
         }
         
         /* Status badges */
@@ -98,7 +104,7 @@
             color: white;
             font-weight: 600;
             padding: 16px 24px;
-            border-radius: 12px;
+            border-radius: 10px;
             transition: all 0.15s ease;
             display: block;
             text-align: center;
@@ -111,7 +117,7 @@
             color: #0A0A0A;
             font-weight: 600;
             padding: 16px 24px;
-            border-radius: 12px;
+            border-radius: 10px;
             transition: all 0.15s ease;
             display: block;
             text-align: center;
@@ -124,8 +130,8 @@
             color: #0A0A0A;
             font-weight: 600;
             padding: 16px 24px;
-            border-radius: 12px;
-            border: 1px solid #E5E5E5;
+            border-radius: 10px;
+            border-bottom: 3px solid #E5E5E5;
             transition: all 0.15s ease;
             display: block;
             text-align: center;
@@ -144,53 +150,58 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            padding: 8px 16px;
-            border-radius: 12px;
-            border: 2px solid transparent;
+            padding: 10px 18px;
+            border-radius: 10px;
             transition: all 0.15s ease;
         }
         
         .nav-item-active {
-            border-color: #FFC107;
-            background: rgba(255, 193, 7, 0.1);
-        }
-        
-        .nav-item-inactive {
-            border-color: #333;
+            background: #FFC107;
         }
         
         .nav-icon {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             stroke-width: 2;
         }
         
-        /* Input styles */
+        /* Input styles with bottom border accent */
         .input {
             width: 100%;
             padding: 14px 16px;
-            border: 1px solid #E5E5E5;
-            border-radius: 12px;
+            border: none;
+            border-bottom: 3px solid #E5E5E5;
+            border-radius: 8px 8px 0 0;
             font-size: 16px;
-            background: white;
+            background: #FAFAFA;
             transition: all 0.15s ease;
         }
         
         .input:focus {
             outline: none;
-            border-color: #FFC107;
-            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.15);
+            border-bottom-color: #FFC107;
+            background: white;
         }
         
         .input::placeholder { color: #A3A3A3; }
+        
+        /* Select styling */
+        select.input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 18px;
+            padding-right: 44px;
+        }
     </style>
     
     {% block head %}{% endblock %}
 </head>
-<body class="bg-[#FAFAFA] min-h-screen {% block body_class %}{% endblock %}">
+<body class="bg-[#F5F5F5] min-h-screen {% block body_class %}{% endblock %}">
     {% block body %}
-    <!-- Header - Yellow -->
-    <header class="bg-brand safe-top">
+    <!-- Header - Yellow with black bottom border -->
+    <header class="bg-brand border-b-4 border-ink safe-top">
         <div class="px-5 py-5">
             {% block header %}
             <div class="flex items-center justify-between">
@@ -209,7 +220,7 @@
     {% if messages %}
     <div class="px-5 pt-4">
         {% for category, message in messages %}
-        <div class="mb-3 p-4 rounded-xl text-sm font-medium {% if category == 'error' %}bg-red-50 text-red-700 border border-red-100{% elif category == 'success' %}bg-green-50 text-green-700 border border-green-100{% else %}bg-blue-50 text-blue-700 border border-blue-100{% endif %}">
+        <div class="mb-3 p-4 rounded-lg border-l-4 text-sm font-medium {% if category == 'error' %}bg-red-50 text-red-700 border-red-500{% elif category == 'success' %}bg-green-50 text-green-700 border-green-500{% else %}bg-blue-50 text-blue-700 border-blue-500{% endif %}">
             {{ message }}
         </div>
         {% endfor %}
@@ -226,17 +237,17 @@
     {% block bottom_nav %}
     <nav class="fixed bottom-0 left-0 right-0 bg-ink safe-bottom">
         <div class="flex justify-around py-3 px-4">
-            <a href="{{ url_for('main.today') }}" class="nav-item {% if request.endpoint == 'main.today' %}nav-item-active{% else %}nav-item-inactive{% endif %}">
-                <i data-lucide="home" class="nav-icon {% if request.endpoint == 'main.today' %}text-brand{% else %}text-white{% endif %}"></i>
+            <a href="{{ url_for('main.today') }}" class="nav-item {% if request.endpoint == 'main.today' %}nav-item-active{% endif %}">
+                <i data-lucide="home" class="nav-icon {% if request.endpoint == 'main.today' %}text-ink{% else %}text-white{% endif %}"></i>
             </a>
-            <a href="{{ url_for('clients.list_clients') }}" class="nav-item {% if request.endpoint and 'clients' in request.endpoint %}nav-item-active{% else %}nav-item-inactive{% endif %}">
-                <i data-lucide="users" class="nav-icon {% if request.endpoint and 'clients' in request.endpoint %}text-brand{% else %}text-white{% endif %}"></i>
+            <a href="{{ url_for('clients.list_clients') }}" class="nav-item {% if request.endpoint and 'clients' in request.endpoint %}nav-item-active{% endif %}">
+                <i data-lucide="users" class="nav-icon {% if request.endpoint and 'clients' in request.endpoint %}text-ink{% else %}text-white{% endif %}"></i>
             </a>
-            <a href="{{ url_for('main.calendar') }}" class="nav-item {% if request.endpoint == 'main.calendar' %}nav-item-active{% else %}nav-item-inactive{% endif %}">
-                <i data-lucide="calendar" class="nav-icon {% if request.endpoint == 'main.calendar' %}text-brand{% else %}text-white{% endif %}"></i>
+            <a href="{{ url_for('main.calendar') }}" class="nav-item {% if request.endpoint == 'main.calendar' %}nav-item-active{% endif %}">
+                <i data-lucide="calendar" class="nav-icon {% if request.endpoint == 'main.calendar' %}text-ink{% else %}text-white{% endif %}"></i>
             </a>
-            <a href="{{ url_for('settings.index') }}" class="nav-item {% if request.endpoint and 'settings' in request.endpoint %}nav-item-active{% else %}nav-item-inactive{% endif %}">
-                <i data-lucide="settings" class="nav-icon {% if request.endpoint and 'settings' in request.endpoint %}text-brand{% else %}text-white{% endif %}"></i>
+            <a href="{{ url_for('settings.index') }}" class="nav-item {% if request.endpoint and 'settings' in request.endpoint %}nav-item-active{% endif %}">
+                <i data-lucide="settings" class="nav-icon {% if request.endpoint and 'settings' in request.endpoint %}text-ink{% else %}text-white{% endif %}"></i>
             </a>
         </div>
     </nav>
