@@ -1,6 +1,240 @@
-{% extends "auth/base.html" %}
-{% block title %}MiKlean - Simple Tools for Cleaning Pros{% endblock %}
-
-{% block content %}
-<!-- Override the auth card to show landing page content -->
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MiKlean - The simplest way to run your cleaning business. Clients, estimates, scheduling, and invoicing in one beautiful app.">
+    <meta name="theme-color" content="#FFC107">
+    <title>MiKlean - Simple Tools for Cleaning Pros</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='favicon-96x96.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'yellow-primary': '#FFC107',
+                        'yellow-light': '#FFECB3',
+                        'yellow-dark': '#FFA000',
+                    },
+                    fontFamily: {
+                        'sans': ['Nunito', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        html { font-family: 'Nunito', system-serif; scroll-behavior: smooth; }
+        .sparkle { color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .gradient-text { background: linear-gradient(135deg, #1a1a1a 0%, #333 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Header -->
+    <header class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+            <span class="text-yellow-primary text-xl">✦</span>
+            <span class="font-bold text-lg">MiKlean</span>
+        </div>
+        <a href="{{ url_for('auth.login') }}" class="bg-yellow-primary text-gray-900 font-bold px-6 py-2 rounded-full hover:bg-yellow-dark transition">
+            Sign In
+        </a>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="bg-yellow-primary py-20 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <span class="sparkle text-4xl">✦</span>
+                <h1 class="text-5xl md:text-7xl font-black text-gray-900">MiKlean</h1>
+                <span class="sparkle text-4xl">✦</span>
+            </div>
+            <p class="text-xl md:text-2xl text-gray-800 font-semibold mb-8">
+                Run your entire cleaning business from your phone.<br>
+                <span class="text-gray-700">No spreadsheets. No paperwork. No headaches.</span>
+            </p>
+            <a href="{{ url_for('auth.register') }}" class="inline-block bg-gray-900 text-white font-bold text-lg px-10 py-4 rounded-full hover:bg-gray-800 transition transform hover:scale-105">
+                Start Free Today →
+            </a>
+            <p class="text-sm text-gray-700 mt-4">Free forever. No credit card required.</p>
+        </div>
+    </section>
+    
+    <!-- Problem Section -->
+    <section class="py-20 px-6 bg-gray-50">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-black text-center text-gray-900 mb-12">
+                Sound familiar?
+            </h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-6">
+                    <div class="text-4xl mb-4">📝</div>
+                    <p class="text-gray-700 font-semibold">"I have client info scattered everywhere — texts, notes, my head..."</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="text-4xl mb-4">🤯</div>
+                    <p class="text-gray-700 font-semibold">"Creating estimates and invoices takes forever"</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="text-4xl mb-4">📅</div>
+                    <p class="text-gray-700 font-semibold">"I've double-booked myself more times than I can count"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Solution Section -->
+    <section class="py-20 px-6">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-black text-center text-gray-900 mb-4">
+                There's a better way.
+            </h2>
+            <p class="text-xl text-gray-600 text-center mb-16">
+                MiKlean puts everything you need in one place — right on your phone.
+            </p>
+            
+            <div class="space-y-12">
+                <!-- Feature 1 -->
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="bg-yellow-light rounded-3xl p-8 w-full md:w-1/3 text-center">
+                        <div class="text-6xl">👥</div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">All Your Clients, One Tap Away</h3>
+                        <p class="text-gray-600 text-lg">Names, addresses, phone numbers, notes — everything organized and searchable. Tap to call, tap to navigate, tap to text.</p>
+                    </div>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="flex flex-col md:flex-row-reverse items-center gap-8">
+                    <div class="bg-yellow-light rounded-3xl p-8 w-full md:w-1/3 text-center">
+                        <div class="text-6xl">💰</div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Professional Estimates in Seconds</h3>
+                        <p class="text-gray-600 text-lg">Create beautiful estimates, send them by text or email, and let clients accept with one tap. No more back-and-forth.</p>
+                    </div>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="bg-yellow-light rounded-3xl p-8 w-full md:w-1/3 text-center">
+                        <div class="text-6xl">📅</div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Never Miss a Cleaning</h3>
+                        <p class="text-gray-600 text-lg">See your day at a glance. Schedule weekly, biweekly, or monthly visits. Mark complete with one tap when you're done.</p>
+                    </div>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="flex flex-col md:flex-row-reverse items-center gap-8">
+                    <div class="bg-yellow-light rounded-3xl p-8 w-full md:w-1/3 text-center">
+                        <div class="text-6xl">📄</div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Invoicing Made Effortless</h3>
+                        <p class="text-gray-600 text-lg">Turn completed visits into invoices automatically. Send professional PDFs. Get paid faster.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Social Proof -->
+    <section class="py-20 px-6 bg-gray-900 text-white">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-black mb-12">
+                Built for cleaners, by people who get it.
+            </h2>
+            <div class="grid md:grid-cols-3 gap-8 text-yellow-primary">
+                <div>
+                    <div class="text-5xl font-black">2 min</div>
+                    <p class="text-gray-400 mt-2">to create an estimate</p>
+                </div>
+                <div>
+                    <div class="text-5xl font-black">1 tap</div>
+                    <p class="text-gray-400 mt-2">to complete a visit</p>
+                </div>
+                <div>
+                    <div class="text-5xl font-black">100%</div>
+                    <p class="text-gray-400 mt-2">free forever</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="py-20 px-6 bg-yellow-primary">
+        <div class="max-w-2xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">
+                Ready to simplify your business?
+            </h2>
+            <p class="text-xl text-gray-800 mb-8">
+                Join hundreds of cleaning pros who've ditched the chaos.
+            </p>
+            <a href="{{ url_for('auth.register') }}" class="inline-block bg-gray-900 text-white font-bold text-lg px-10 py-4 rounded-full hover:bg-gray-800 transition transform hover:scale-105">
+                Get Started Free →
+            </a>
+            <p class="text-sm text-gray-700 mt-4">Takes 30 seconds. No credit card needed.</p>
+        </div>
+    </section>
+    
+    <!-- FAQ Section -->
+    <section class="py-20 px-6" id="faq">
+        <div class="max-w-2xl mx-auto">
+            <h2 class="text-3xl font-black text-center text-gray-900 mb-12">
+                Questions? We've got answers.
+            </h2>
+            
+            <div class="space-y-6">
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Is it really free?</h3>
+                    <p class="text-gray-600">Yes! MiKlean is completely free. No trials, no hidden fees, no credit card required. We believe every cleaner deserves great tools.</p>
+                </div>
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Do I need to download an app?</h3>
+                    <p class="text-gray-600">Nope! MiKlean works right in your browser. Just add it to your home screen and it works just like an app — no app store needed.</p>
+                </div>
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Can I use it on my computer too?</h3>
+                    <p class="text-gray-600">Absolutely. MiKlean works on any device — phone, tablet, or computer. Your data syncs automatically.</p>
+                </div>
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">What if I already have clients?</h3>
+                    <p class="text-gray-600">Adding your existing clients takes just a few minutes. Most cleaners have their whole business set up in under an hour.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-center py-8 px-6">
+        <div class="flex items-center justify-center gap-2 mb-4">
+            <span class="text-yellow-primary">✦</span>
+            <span class="font-bold text-white">MiKlean</span>
+            <span class="text-yellow-primary">✦</span>
+        </div>
+        <p class="text-gray-400 text-sm">
+            Created by <a href="https://untitledpublishers.com" target="_blank" class="text-yellow-primary hover:text-yellow-light font-semibold">Untitled Publishers</a>
+        </p>
+        <div class="mt-4 space-x-6">
+            <a href="{{ url_for('auth.login') }}" class="text-gray-400 hover:text-white text-sm">Sign In</a>
+            <a href="{{ url_for('auth.register') }}" class="text-gray-400 hover:text-white text-sm">Sign Up</a>
+        </div>
+    </footer>
+</body>
+</html>
