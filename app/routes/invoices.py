@@ -4,6 +4,7 @@ Invoice routes - create, view, send, mark paid, PDF download.
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
 from datetime import date, datetime
 import secrets
+import urllib.parse
 from ..auth import login_required, get_current_user_id, get_user_profile
 from ..supabase_client import get_supabase
 
@@ -317,7 +318,7 @@ def download_invoice_pdf(invoice_id):
 @bp.route('/invoices/<invoice_id>/send', methods=['GET', 'POST'])
 @login_required
 def send_invoice(invoice_id):
-    """Send invoice to client."""
+    """Send invoice to client - opens email or SMS app."""
     user_id = get_current_user_id()
     supabase = get_supabase()
     
@@ -347,44 +348,53 @@ def send_invoice(invoice_id):
     # Generate public URL
     public_url = url_for('invoices.public_invoice', token=invoice['public_token'], _external=True)
     
+    # Get business info for message
+    profile = get_user_profile()
+    business_name = profile.get('business_name') or 'Your cleaner'
+    
     if request.method == 'POST':
         send_method = request.form.get('method')
         
+        # Update status to sent
+        supabase.table('invoices').update({
+            'status': 'sent',
+            'sent_at': datetime.utcnow().isoformat()
+        }).eq('id', invoice_id).execute()
+        
         if send_method == 'email':
-            if not client.get('email'):
-                flash('Client has no email address. Please add one first.', 'error')
-                return redirect(url_for('clients.edit_client', client_id=invoice['client_id']))
+            # Build email
+            subject = f"Invoice {invoice['invoice_number']} from {business_name}"
+            body = f"""Hi {client['name']},
+
+Here's your invoice for ${invoice['total']:.2f} from {business_name}.
+
+View your invoice: {public_url}
+
+Thank you for your business!
+
+{business_name}"""
             
-            # TODO: Send email via SendGrid with link
-            # For now, mark as sent
-            supabase.table('invoices').update({
-                'status': 'sent',
-                'sent_at': datetime.utcnow().isoformat()
-            }).eq('id', invoice_id).execute()
+            # URL encode for mailto
+            encoded_subject = urllib.parse.quote(subject)
+            encoded_body = urllib.parse.quote(body)
+            mailto_url = f"mailto:{client['email']}?subject={encoded_subject}&body={encoded_body}"
             
-            flash(f'Invoice sent to {client["email"]}.', 'success')
-            return redirect(url_for('invoices.view_invoice', invoice_id=invoice_id))
+            return redirect(mailto_url)
             
         elif send_method == 'text':
-            # Generate SMS message with link
-            profile = get_user_profile()
-            business_name = profile.get('business_name') or 'Your cleaner'
-            
+            # Build SMS message
             message = f"Hi {client['name']}! Here's your invoice for ${invoice['total']:.2f} from {business_name}: {public_url}"
             
-            # Update status
-            supabase.table('invoices').update({
-                'status': 'sent',
-                'sent_at': datetime.utcnow().isoformat()
-            }).eq('id', invoice_id).execute()
-            
-            # Redirect to SMS app
-            import urllib.parse
             encoded_message = urllib.parse.quote(message)
             sms_url = f"sms:{client['phone']}?body={encoded_message}"
+            
             return redirect(sms_url)
     
-    return render_template('invoices/send.html', invoice=invoice, client=client, public_url=public_url)
+    return render_template('invoices/send.html', 
+                           invoice=invoice, 
+                           client=client, 
+                           public_url=public_url,
+                           business_name=business_name)
 
 
 @bp.route('/invoices/<invoice_id>/paid', methods=['POST'])
