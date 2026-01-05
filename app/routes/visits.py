@@ -12,7 +12,7 @@ bp = Blueprint('visits', __name__)
 @bp.route('/clients/<client_id>/schedule', methods=['GET', 'POST'])
 @login_required
 def schedule_visits(client_id):
-    """Add a client to the schedule (create recurring visits)."""
+    """Add a client to the schedule - either one-time or recurring."""
     user_id = get_current_user_id()
     supabase = get_supabase()
     
@@ -43,8 +43,8 @@ def schedule_visits(client_id):
     
     if request.method == 'POST':
         start_date_str = request.form.get('start_date', '').strip()
-        frequency = request.form.get('frequency', 'weekly')
-        preferred_day = request.form.get('preferred_day', '').strip()
+        schedule_type = request.form.get('frequency', 'one_time')  # one_time or recurring
+        recurring_frequency = request.form.get('recurring_frequency', 'weekly')
         preferred_time_str = request.form.get('preferred_time', '').strip() or None
         
         # Validation
@@ -54,9 +54,6 @@ def schedule_visits(client_id):
         except ValueError:
             errors.append('Invalid start date.')
             start_date = None
-        
-        if frequency not in ['weekly', 'biweekly', 'monthly', 'one_time']:
-            errors.append('Invalid frequency.')
         
         if errors:
             for error in errors:
@@ -69,31 +66,29 @@ def schedule_visits(client_id):
         scheduled_time = None
         if preferred_time_str:
             try:
-                # Handle common formats
-                if ':' in preferred_time_str:
-                    time_parts = preferred_time_str.replace(' AM', '').replace(' PM', '').replace('AM', '').replace('PM', '')
-                    scheduled_time = datetime.strptime(time_parts.strip(), '%H:%M').time()
+                scheduled_time = datetime.strptime(preferred_time_str, '%H:%M').time()
             except:
-                pass  # Ignore invalid time, will be None
+                pass
         
-        # Generate visits for next 8 weeks (rolling window)
+        # Generate visits
         visits_to_create = []
         estimate_id = estimate['id'] if estimate else None
         
-        if frequency == 'one_time':
-            # Single visit
+        if schedule_type == 'one_time':
+            # Single visit only
             visits_to_create.append({
                 'client_id': client_id,
                 'user_id': user_id,
                 'estimate_id': estimate_id,
                 'scheduled_date': start_date.isoformat(),
                 'scheduled_time': scheduled_time.isoformat() if scheduled_time else None,
-                'status': 'scheduled'
+                'status': 'scheduled',
+                'is_recurring': False
             })
         else:
             # Recurring visits - 8 weeks worth
             current_date = start_date
-            interval = get_interval_days(frequency)
+            interval = get_interval_days(recurring_frequency)
             
             for _ in range(8):
                 visits_to_create.append({
@@ -102,15 +97,19 @@ def schedule_visits(client_id):
                     'estimate_id': estimate_id,
                     'scheduled_date': current_date.isoformat(),
                     'scheduled_time': scheduled_time.isoformat() if scheduled_time else None,
-                    'status': 'scheduled'
+                    'status': 'scheduled',
+                    'is_recurring': True,
+                    'recurring_frequency': recurring_frequency
                 })
                 current_date = current_date + timedelta(days=interval)
         
         try:
             supabase.table('visits').insert(visits_to_create).execute()
             
-            visit_count = len(visits_to_create)
-            flash(f'{visit_count} visit(s) scheduled for {client["name"]}.', 'success')
+            if schedule_type == 'one_time':
+                flash(f'Visit scheduled for {client["name"]} on {start_date.strftime("%b %d")}.', 'success')
+            else:
+                flash(f'{len(visits_to_create)} visits scheduled for {client["name"]}.', 'success')
             return redirect(url_for('clients.view_client', client_id=client_id))
             
         except Exception as e:
@@ -155,7 +154,7 @@ def complete_visit(visit_id):
     try:
         # Get visit info first
         visit_response = supabase.table('visits')\
-            .select('*, estimates(frequency)')\
+            .select('*')\
             .eq('id', visit_id)\
             .eq('user_id', user_id)\
             .single()\
@@ -174,14 +173,14 @@ def complete_visit(visit_id):
             'completed_at': datetime.utcnow().isoformat()
         }).eq('id', visit_id).eq('user_id', user_id).execute()
         
-        # If recurring, create next visit to maintain 8-week window
-        if visit.get('estimates') and visit['estimates'].get('frequency') != 'one_time':
+        # Only create new visits if this is a recurring visit
+        if visit.get('is_recurring') and visit.get('recurring_frequency'):
             maintain_rolling_window(
                 supabase, 
                 user_id, 
                 visit['client_id'], 
                 visit.get('estimate_id'),
-                visit['estimates']['frequency']
+                visit['recurring_frequency']
             )
         
         flash('Visit marked as complete.', 'success')
@@ -281,16 +280,16 @@ def get_interval_days(frequency):
 
 
 def maintain_rolling_window(supabase, user_id, client_id, estimate_id, frequency):
-    """Ensure there are always 8 weeks of future visits scheduled."""
+    """Ensure there are always 8 weeks of future visits scheduled for recurring clients."""
     today = date.today()
-    eight_weeks_out = today + timedelta(weeks=8)
     
-    # Count future scheduled visits
+    # Count future scheduled recurring visits for this client
     response = supabase.table('visits')\
         .select('scheduled_date')\
         .eq('client_id', client_id)\
         .eq('user_id', user_id)\
         .eq('status', 'scheduled')\
+        .eq('is_recurring', True)\
         .gte('scheduled_date', today.isoformat())\
         .order('scheduled_date', desc=True)\
         .execute()
@@ -317,7 +316,9 @@ def maintain_rolling_window(supabase, user_id, client_id, estimate_id, frequency
             'user_id': user_id,
             'estimate_id': estimate_id,
             'scheduled_date': current_date.isoformat(),
-            'status': 'scheduled'
+            'status': 'scheduled',
+            'is_recurring': True,
+            'recurring_frequency': frequency
         })
         current_date = current_date + timedelta(days=interval)
     
