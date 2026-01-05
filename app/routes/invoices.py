@@ -9,6 +9,17 @@ from ..supabase_client import get_supabase
 bp = Blueprint('invoices', __name__)
 
 
+def get_visit_price(visit):
+    """Get the price for a visit - use visit.price first, fall back to estimate."""
+    # First check if visit has its own price
+    if visit.get('price') is not None:
+        return float(visit['price'])
+    # Fall back to estimate price
+    if visit.get('estimates') and visit['estimates'].get('price_per_visit'):
+        return float(visit['estimates']['price_per_visit'])
+    return 0
+
+
 @bp.route('/clients/<client_id>/invoice', methods=['GET', 'POST'])
 @login_required
 def create_invoice(client_id):
@@ -42,12 +53,9 @@ def create_invoice(client_id):
     
     available_visits = visits_response.data if visits_response.data else []
     
-    # Add price to each visit
+    # Add price to each visit (visit price takes precedence over estimate)
     for visit in available_visits:
-        if visit.get('estimates') and visit['estimates'].get('price_per_visit'):
-            visit['price'] = float(visit['estimates']['price_per_visit'])
-        else:
-            visit['price'] = 0
+        visit['price'] = get_visit_price(visit)
     
     if request.method == 'POST':
         selected_visit_ids = request.form.getlist('visits')
@@ -139,10 +147,7 @@ def view_invoice(invoice_id):
     
     # Add price to each visit
     for visit in visits:
-        if visit.get('estimates') and visit['estimates'].get('price_per_visit'):
-            visit['price'] = float(visit['estimates']['price_per_visit'])
-        else:
-            visit['price'] = 0
+        visit['price'] = get_visit_price(visit)
     
     return render_template('invoices/view.html', invoice=invoice, visits=visits)
 
@@ -179,10 +184,7 @@ def preview_invoice(invoice_id):
     visits = visits_response.data if visits_response.data else []
     
     for visit in visits:
-        if visit.get('estimates') and visit['estimates'].get('price_per_visit'):
-            visit['price'] = float(visit['estimates']['price_per_visit'])
-        else:
-            visit['price'] = 0
+        visit['price'] = get_visit_price(visit)
     
     return render_template('invoices/preview.html', 
                            invoice=invoice, 
@@ -224,10 +226,7 @@ def download_invoice_pdf(invoice_id):
         visits = visits_response.data if visits_response.data else []
         
         for visit in visits:
-            if visit.get('estimates') and visit['estimates'].get('price_per_visit'):
-                visit['price'] = float(visit['estimates']['price_per_visit'])
-            else:
-                visit['price'] = 0
+            visit['price'] = get_visit_price(visit)
         
         # Generate PDF
         from ..services.pdf import generate_invoice_pdf
