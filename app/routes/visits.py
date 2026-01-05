@@ -70,6 +70,8 @@ def schedule_visits(client_id):
         start_date_str = request.form.get('start_date', '').strip()
         schedule_type = request.form.get('frequency', 'one_time')  # one_time or recurring
         recurring_frequency = request.form.get('recurring_frequency', 'weekly')
+        custom_months = request.form.get('custom_months', '3')
+        num_visits = int(request.form.get('num_visits', '8'))
         preferred_time_str = request.form.get('preferred_time', '').strip() or None
         price_str = request.form.get('price', '').strip()
         
@@ -93,6 +95,16 @@ def schedule_visits(client_id):
         
         if not price:
             errors.append('Price is required.')
+        
+        # Parse custom months if needed
+        if recurring_frequency == 'custom':
+            try:
+                custom_months_int = int(custom_months)
+                if custom_months_int < 1 or custom_months_int > 12:
+                    errors.append('Custom months must be between 1 and 12.')
+            except ValueError:
+                errors.append('Invalid custom months value.')
+                custom_months_int = 3
         
         if errors:
             for error in errors:
@@ -126,11 +138,16 @@ def schedule_visits(client_id):
                 'price': price
             })
         else:
-            # Recurring visits - 8 weeks worth
+            # Recurring visits
             current_date = start_date
-            interval = get_interval_days(recurring_frequency)
+            interval_days = get_interval_days(recurring_frequency, custom_months_int if recurring_frequency == 'custom' else None)
             
-            for _ in range(8):
+            # Store the frequency string for maintaining rolling window
+            freq_to_store = recurring_frequency
+            if recurring_frequency == 'custom':
+                freq_to_store = f'custom_{custom_months_int}'
+            
+            for _ in range(num_visits):
                 visits_to_create.append({
                     'client_id': client_id,
                     'user_id': user_id,
@@ -139,10 +156,10 @@ def schedule_visits(client_id):
                     'scheduled_time': scheduled_time.isoformat() if scheduled_time else None,
                     'status': 'scheduled',
                     'is_recurring': True,
-                    'recurring_frequency': recurring_frequency,
+                    'recurring_frequency': freq_to_store,
                     'price': price
                 })
-                current_date = current_date + timedelta(days=interval)
+                current_date = add_interval(current_date, recurring_frequency, custom_months_int if recurring_frequency == 'custom' else None)
         
         try:
             supabase.table('visits').insert(visits_to_create).execute()
@@ -222,7 +239,7 @@ def complete_visit(visit_id):
                 visit['client_id'], 
                 visit.get('estimate_id'),
                 visit['recurring_frequency'],
-                visit.get('price')  # Pass the price for new visits
+                visit.get('price')
             )
         
         flash('Visit marked as complete.', 'success')
@@ -309,7 +326,7 @@ def reschedule_visit(visit_id):
     return render_template('visits/reschedule.html', visit=visit)
 
 
-def get_interval_days(frequency):
+def get_interval_days(frequency, custom_months=None):
     """Get the number of days between visits based on frequency."""
     if frequency == 'weekly':
         return 7
@@ -317,13 +334,57 @@ def get_interval_days(frequency):
         return 14
     elif frequency == 'monthly':
         return 30  # Approximate
+    elif frequency == 'custom' and custom_months:
+        return custom_months * 30  # Approximate
+    elif frequency.startswith('custom_'):
+        # Parse stored format like "custom_3"
+        months = int(frequency.split('_')[1])
+        return months * 30
     else:
         return 0
 
 
+def add_interval(current_date, frequency, custom_months=None):
+    """Add the appropriate interval to a date, handling month boundaries properly."""
+    if frequency == 'weekly':
+        return current_date + timedelta(days=7)
+    elif frequency == 'biweekly':
+        return current_date + timedelta(days=14)
+    elif frequency == 'monthly':
+        # Add one month properly
+        return add_months(current_date, 1)
+    elif frequency == 'custom' and custom_months:
+        return add_months(current_date, custom_months)
+    elif frequency.startswith('custom_'):
+        months = int(frequency.split('_')[1])
+        return add_months(current_date, months)
+    else:
+        return current_date
+
+
+def add_months(source_date, months):
+    """Add months to a date, handling month boundaries."""
+    month = source_date.month - 1 + months
+    year = source_date.year + month // 12
+    month = month % 12 + 1
+    day = min(source_date.day, [31, 29 if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0) else 28,
+                                  31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1])
+    return date(year, month, day)
+
+
 def maintain_rolling_window(supabase, user_id, client_id, estimate_id, frequency, price=None):
-    """Ensure there are always 8 weeks of future visits scheduled for recurring clients."""
+    """Ensure there are always enough future visits scheduled for recurring clients."""
     today = date.today()
+    
+    # Determine target count based on frequency
+    # For longer intervals, we don't need as many future visits
+    if frequency.startswith('custom_'):
+        months = int(frequency.split('_')[1])
+        target_count = max(4, 12 // months)  # At least 4, but scale down for longer intervals
+    elif frequency == 'monthly':
+        target_count = 6
+    else:
+        target_count = 8
     
     # Count future scheduled recurring visits for this client
     response = supabase.table('visits')\
@@ -338,7 +399,7 @@ def maintain_rolling_window(supabase, user_id, client_id, estimate_id, frequency
     
     future_visits = response.data if response.data else []
     
-    if len(future_visits) >= 8:
+    if len(future_visits) >= target_count:
         return  # Already have enough
     
     # Find the last scheduled date and get price from existing visits if not provided
@@ -349,12 +410,11 @@ def maintain_rolling_window(supabase, user_id, client_id, estimate_id, frequency
     else:
         last_date = today
     
-    # Add visits until we have 8 weeks covered
-    interval = get_interval_days(frequency)
+    # Add visits until we have enough
     visits_to_create = []
     
-    current_date = last_date + timedelta(days=interval)
-    while len(future_visits) + len(visits_to_create) < 8:
+    current_date = add_interval(last_date, frequency)
+    while len(future_visits) + len(visits_to_create) < target_count:
         visits_to_create.append({
             'client_id': client_id,
             'user_id': user_id,
@@ -365,7 +425,7 @@ def maintain_rolling_window(supabase, user_id, client_id, estimate_id, frequency
             'recurring_frequency': frequency,
             'price': price
         })
-        current_date = current_date + timedelta(days=interval)
+        current_date = add_interval(current_date, frequency)
     
     if visits_to_create:
         supabase.table('visits').insert(visits_to_create).execute()
