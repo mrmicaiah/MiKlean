@@ -7,7 +7,7 @@
         <h1 class="text-2xl font-bold text-ink tracking-tight">Calendar</h1>
         <p class="text-sm text-ink/60 font-medium mt-0.5">{{ selected_date.strftime('%B %Y') }}</p>
     </div>
-    <a href="{{ url_for('clients.new_client') }}" class="fab">
+    <a href="{{ url_for('visits.pick_client_for_schedule') }}" class="fab">
         <i data-lucide="plus" class="w-6 h-6 text-ink stroke-[2.5]"></i>
     </a>
 </div>
