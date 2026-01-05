@@ -55,6 +55,30 @@
             min-height: 100vh;
         }
         
+        /* Header with diagonal stripes accent */
+        .header-pattern {
+            background-color: #FFC107;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-pattern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -20px;
+            width: 100px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                -55deg,
+                transparent,
+                transparent 8px,
+                #0A0A0A 8px,
+                #0A0A0A 16px
+            );
+            opacity: 0.15;
+        }
+        
         /* Cards with left accent border */
         .card {
             background: white;
@@ -194,15 +218,32 @@
             background-size: 18px;
             padding-right: 44px;
         }
+        
+        /* Floating action button */
+        .fab {
+            width: 52px;
+            height: 52px;
+            background: #0A0A0A;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            transition: all 0.15s ease;
+        }
+        
+        .fab:active {
+            transform: scale(0.95);
+        }
     </style>
     
     {% block head %}{% endblock %}
 </head>
 <body class="bg-[#F5F5F5] min-h-screen {% block body_class %}{% endblock %}">
     {% block body %}
-    <!-- Header - Yellow with black bottom border -->
-    <header class="bg-brand border-b-4 border-ink safe-top">
-        <div class="px-5 py-5">
+    <!-- Header - Yellow with pattern and black bottom border -->
+    <header class="header-pattern border-b-4 border-ink safe-top">
+        <div class="px-5 py-5 relative z-10">
             {% block header %}
             <div class="flex items-center justify-between">
                 <div>
