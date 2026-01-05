@@ -22,7 +22,7 @@
     
     <div class="space-y-3 mb-4">
         {% for visit in visits %}
-        <label class="card block cursor-pointer">
+        <label class="card card-brand block cursor-pointer">
             <div class="flex items-start">
                 <input type="checkbox" name="visits" value="{{ visit.id }}" checked
                     class="w-5 h-5 mt-0.5 rounded border-neutral-300 text-brand focus:ring-brand">
@@ -40,7 +40,7 @@
         {% endfor %}
     </div>
     
-    <div class="card mb-6 bg-ink text-white">
+    <div class="bg-ink text-white rounded-lg p-5 mb-6 border-l-4 border-brand">
         <div class="flex justify-between items-center">
             <span class="text-white/70 font-medium">Total</span>
             <span id="total" class="text-2xl font-bold text-brand">${{ "%.2f"|format(visits|sum(attribute='price')) }}</span>
