@@ -77,12 +77,14 @@ def list_clients():
 def new_client():
     """Add a new prospect."""
     user_id = get_current_user_id()
+    next_action = request.args.get('next', '')  # 'schedule' to redirect to scheduling
     
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         phone = request.form.get('phone', '').strip()
         email = request.form.get('email', '').strip() or None
         notes = request.form.get('notes', '').strip() or None
+        next_action = request.form.get('next_action', '')
         
         # Address fields
         street1 = request.form.get('street1', '').strip()
@@ -112,7 +114,8 @@ def new_client():
             return render_template('clients/new.html',
                                    name=name, phone=phone, email=email, notes=notes,
                                    street1=street1, street2=street2, city=city, 
-                                   state=state, zip_code=zip_code)
+                                   state=state, zip_code=zip_code,
+                                   next_action=next_action)
         
         # Build full address for legacy compatibility
         address = format_full_address({
@@ -138,15 +141,22 @@ def new_client():
             }).execute()
             
             if response.data:
+                client_id = response.data[0]['id']
+                
+                # If coming from schedule flow, go to scheduling
+                if next_action == 'schedule':
+                    flash(f'{name} added. Now schedule their visit.', 'success')
+                    return redirect(url_for('visits.schedule_visits', client_id=client_id))
+                
                 flash(f'{name} added as a prospect.', 'success')
-                return redirect(url_for('clients.view_client', client_id=response.data[0]['id']))
+                return redirect(url_for('clients.view_client', client_id=client_id))
             else:
                 flash('Failed to add prospect.', 'error')
                 
         except Exception as e:
             flash('Failed to add prospect.', 'error')
     
-    return render_template('clients/new.html')
+    return render_template('clients/new.html', next_action=next_action)
 
 
 @bp.route('/clients/<client_id>')
