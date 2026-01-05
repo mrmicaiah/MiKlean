@@ -6,6 +6,12 @@
 <p class="text-sm font-semibold text-gray-700 mt-1">{{ today.strftime('%A, %B %d') }}</p>
 {% endblock %}
 
+{% block header_actions %}
+<a href="{{ url_for('clients.new_client') }}" class="bg-white text-gray-900 font-bold px-4 py-2 rounded-full text-sm">
+    + Add
+</a>
+{% endblock %}
+
 {% block content %}
 {% if visits %}
 <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">{{ visits|length }} VISIT{{ 's' if visits|length != 1 else '' }} TODAY</p>
@@ -32,11 +38,15 @@
 </div>
 {% endif %}
 
-<!-- Quick Add Button -->
-<div class="mt-6">
+<!-- Quick Actions -->
+<div class="mt-6 space-y-3">
+    <a href="{{ url_for('clients.new_client') }}" 
+       class="block w-full text-center bg-yellow-primary text-gray-900 font-bold py-4 rounded-xl">
+        + Add New Client
+    </a>
     <a href="{{ url_for('clients.list_clients') }}" 
-       class="block w-full text-center py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-semibold hover:border-yellow-primary hover:text-gray-900 transition">
-        + View Clients
+       class="block w-full text-center py-4 border-2 border-gray-300 rounded-xl text-gray-600 font-semibold hover:border-yellow-primary hover:text-gray-900 transition">
+        View All Clients
     </a>
 </div>
 {% endblock %}
